@@ -1,0 +1,76 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 向Swift 3迁移 (未完待更新) · En2De's ProJ</title><meta name="description" content="向Swift 3迁移 (未完待更新) - En2De"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="short icon" href="../../../../favicon.png"><link rel="stylesheet" href="../../../../css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://yoursite.com/atom.xml" title="En2De's ProJ"></head><body><div class="wrap"><header><a href="../../../../index.html" class="logo-link"><img src="/favicon.png"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li><li class="nav-list-item"><a href="https://github.com/en2de" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="mailto:envy.chen@me.com" target="_self" class="nav-list-link">MAIL</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><section class="container"><div class="post"><article class="post-block"><h1 class="post-title">向Swift 3迁移 (未完待更新)</h1><div class="post-info">2016年9月15日</div><div class="post-content"><h3>语法上的改变</h3>
+<ol>
+<li>当闭包做为参数传递给函数时, Swift3.0将隐式声明为<code>non-escaping</code>, Swift2.2为<code>escaping</code>, 因此要在函数作用域外使用作为参数传递的闭包时, 需要使用<code>@escaping</code>显示声明</li>
+<li><code>++</code>(自增)与<code>--</code>(自减)运算符被移除, 使用<code>+=</code>与<code>-=</code>代替.</li>
+<li>函数类型签名现在需要将参数包含在()之中, 之前的 Int -&gt; () 现在为 (Int) -&gt; ().</li>
+<li>第一个参数将同其他参数一样需要一个参数名, 如不需要则需要显示使用<code>_</code>去掉第一个参数的参数名.</li>
+<li>之前函数柯里化的语法被移除.</li>
+<li>C风格的循环<code>for ;;</code> 被移除了, 现在统一使用 <code>for .. in</code>定义循环</li>
+<li>泛型方法的约束现在被移到到方法的尾部</li>
+<li>dynamicType属性现在被移除了, 并使用type(of: Instance)代替</li>
+<li><code>#keyPath</code>用来获取实例的属性名, 可以使用自动提示来选择实例的属性, 避免输入字面量时出错.</li>
+<li><code>#selector</code>用来获取实例的方法名, 作用同上.</li>
+<li>Unsafe pointers 现在不再为可空, 使用可空类型代替.</li>
+</ol>
+<p>示例:</p>
+<p><figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//swift 2.2</span></div><div class="line">...</div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">register</span><span class="params">(callback: Int -&gt; <span class="params">()</span></span></span>) &#123;</div><div class="line">	counter++</div><div class="line">	<span class="keyword">self</span>.callback = callback</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">doSomething</span><span class="params">(@noescaping callback: Int -&gt; <span class="params">()</span></span></span>) &#123;</div><div class="line">	callback(<span class="keyword">self</span>.value)</div><div class="line">&#125;</div><div class="line">...</div><div class="line"></div><div class="line"><span class="comment">//swift 3.0</span></div><div class="line">...</div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">register</span><span class="params">(callback: @escaping <span class="params">(Int)</span></span></span> -&gt; ()) &#123;</div><div class="line">	counter += <span class="number">1</span></div><div class="line">	<span class="keyword">self</span>.callback = callback</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">doSomething</span><span class="params">(callback: <span class="params">(Int)</span></span></span> -&gt; ()) &#123;</div><div class="line">	callback(<span class="keyword">self</span>.value)</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3>XCode 8.0</h3>
+<p>Swift 3.0 改动较大, 为了与之前的2.2.x迁移缓冲, 项目的Build Settings中新增了一个配置选项<strong>Use Legacy Swift Language Version</strong>对应配置文件中的<strong>SWIFT_VERSION</strong>项.</p>
+<p>当此项选择为YES时,  <strong>SWIFT_VERSION</strong> = 3.0</p>
+<p>当此项选择为NO时,  <strong>SWIFT_VERSION</strong> = 2.3</p>
+<p>Xcode提供了迁移工具, 在菜单 <strong>Edit -&gt; Convert -&gt; To Current Swift Syntax...</strong>, 可以选择使用2.3 还是 3.0, 不过这个工具十分不智能, 不要指望运行一次解决所有问题, 更不要多次使用转换, 后果就是给你加上一堆莫名其妙的访问级别关键字</p>
+<p>另外很重要的一点是 Swift 3.0 与 2.3 无法实现二进制兼容, 3.0 编译的Framework 2.3 用不了, 反之亦然, 这个改变对于引用的第三方库就造成了很大的麻烦, 有的第三方库一步到位, 直接升级到Swift 3.0, 有的呢, 只兼容了2.3. 而你在一个项目里只能要嘛3.0 要嘛2.3. 这个问题当前没有什么解决办法, 只能等待第三方库的更新, 或者寻找支持Swift 3.0的第三方库替代品, 我建议直接使用3.0, 因为2.3毕竟只是一个过渡, 等第三方库升级到Swift 3.0, 项目要是使用2.3, 就得要再折腾一次.</p>
+<h3>新增两个访问级别</h3>
+<p><strong>fileprivate</strong> 与 <strong>open</strong>, 具体的说明直接摘自Apple官方文档Swift编程语言,更多详细信息查看其中<strong>Access Control</strong>部分</p>
+<blockquote>
+<p>####Access Levels</p>
+<p>Swift provides five different access levels for entities within your code. These access levels are relative to the source file in which an entity is defined, and also relative to the module that source file belongs to.</p>
+<ul>
+<li>
+<p>Open access and public access enable entities to be used within any source file from their defining module, and also in a source file from another module that imports the defining module. You typically use open or public access when specifying the public interface to a framework. The difference between open and public access is described below.</p>
+</li>
+<li>
+<p>Internal access enables entities to be used within any source file from their defining module, but not in any source file outside of that module. You typically use internal access when defining an app’s or a framework’s internal structure.</p>
+</li>
+<li>
+<p>File-private access restricts the use of an entity to its own defining source file. Use file-private access to hide the implementation details of a specific piece of functionality when those details are used within an entire file.</p>
+</li>
+<li>
+<p>Private access restricts the use of an entity to the enclosing declaration. Use private access to hide the implementation details of a specific piece of functionality when those details are used only within a single declaration.</p>
+</li>
+</ul>
+<p>Open access is the highest (least restrictive) access level and private access is the lowest (most restrictive) access level.</p>
+<p>Open access applies only to classes and class members, and it differs from public access as follows:</p>
+<ul>
+<li>
+<p>Classes with public access, or any more restrictive access level, can be subclassed only within the module where they’re defined.</p>
+</li>
+<li>
+<p>Class members with public access, or any more restrictive access level, can be overridden by subclasses only within the module where they’re defined.</p>
+</li>
+<li>
+<p>Open classes can be subclassed within the module where they’re defined, and within any module that imports the module where they’re defined.</p>
+</li>
+<li>
+<p>Open class members can be overridden by subclasses within the module where they’re defined, and within any module that imports the module where they’re defined.</p>
+</li>
+</ul>
+<p>Marking a class as open explicitly indicates that you’ve considered the impact of code from other modules using that class as a superclass, and that you’ve designed your class’s code accordingly.</p>
+</blockquote>
+<h3>Foundation</h3>
+<p>待更新</p>
+<h3>GCD &amp; Core Graphics</h3>
+<p>待更新</p>
+<h3>API Design Guide line</h3>
+<p>待更新</p>
+</div></article></div></section><footer><div class="paginator"><a href="../../../03/05/FourierTransformation/" class="next">下一篇</a></div><div data-thread-key="2016/09/15/MigratingToSwift3/" data-title="向Swift 3迁移 (未完待更新)" data-url="http://yoursite.com/2016/09/15/MigratingToSwift3/" data-author-key="1" class="ds-thread"></div><script>var duoshuoQuery = {short_name:"en2de"};
+(function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+})();
+
+</script><div class="copyright"><p>© 2015 - 2016 <a href="http://yoursite.com">En2De</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>
